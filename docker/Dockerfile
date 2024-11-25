@@ -15,6 +15,7 @@ RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     tar\
     unzip\
     neovim\
+    eog\
     && apt-get clean
 
 # Set Python 3.8 as the default python version
