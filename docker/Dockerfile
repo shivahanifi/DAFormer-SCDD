@@ -2,11 +2,14 @@
 FROM nvidia/cuda:11.0.3-base-ubuntu20.04
 
 # Install Python 3.8.5 and other dependencies
-RUN apt-get update && apt-get install -y \
+RUN apt-get update && DEBIAN_FRONTEND=noninteractive apt-get install -y \
     python3.8 \
     python3.8-dev \
     python3-pip \
     python3.8-venv \
+    libgl1\
+    libgl1-mesa-glx \
+    libglib2.0-0\
     git\
     neovim\
     && apt-get clean
