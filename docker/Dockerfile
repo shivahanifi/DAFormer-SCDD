@@ -29,12 +29,13 @@ RUN pip3 install --no-cache-dir -r requirements.txt -f https://download.pytorch.
     pip3 install mmcv-full==1.3.7 && \
     pip3 install gdown 
 
-
-
 # Create necessary directories
 RUN mkdir -p pretrained work_dirs
 
+# Download demo requirements and store in work_dirs directory
+WORKDIR /DAFormer-SCDD/work_dirs
 RUN gdown https://drive.google.com/uc?id=1pG3kDClZDGwp1vSTEXmTchkGHmnLQNdP
+RUN tar -xzvf 211108_1622_gta2cs_daformer_s0_7f24c.tar.gz 
 
-# Set the PYTHONPATH to include your project directory
+# Set the PYTHONPATH to include project directory
 ENV PYTHONPATH=/DAFormer-SCDD:$PYTHONPATH
