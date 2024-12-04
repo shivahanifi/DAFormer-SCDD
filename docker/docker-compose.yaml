@@ -1,0 +1,16 @@
+version: '3.8' 
+services:
+  daformer-scdd:
+    image: daformer-scdd 
+    container_name: daformer-scdd-container 
+    runtime: nvidia 
+    shm_size: '256m' 
+    environment:
+      - DISPLAY=${DISPLAY}  
+    volumes:
+      - /tmp/.X11-unix:/tmp/.X11-unix  
+      - /home/shiva/Documents/code/DAFormer-SCDD/share:/DAFormer-SCDD/share 
+    stdin_open: true
+    tty: true
+    entrypoint: /bin/bash
+    command: -l
