@@ -1,8 +1,8 @@
 #!/bin/bash
 
 # Remote host details
-REMOTE_HOST="shanifi@pc-ubix.uni.lux"  # Replace with your remote host IP or domain
-REMOTE_PATH="/home/user"  # Path on the remote machine where Docker is running
+REMOTE_HOST="shanifi@pc-ubix.uni.lux"  
+REMOTE_PATH="/home/shanifi/code/DAFormer-SCDD" 
 IMAGE_NAME="daformer-scdd"
 
 # Get the container ID for the specific image on the remote host
@@ -119,4 +119,4 @@ else
 fi
 
 ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c 'python tools/convert_datasets/gta.py data/gta --nproc 8'"
-h
+
