@@ -51,7 +51,7 @@ fi
 TAR_FILE="/home/shiva/Desktop/211108_1622_gta2cs_daformer_s0_7f24c.tar.gz"
 DEST_TAR_FILE="$REMOTE_PATH/work_dirs/211108_1622_gta2cs_daformer_s0_7f24c.tar.gz"
 
-if ssh "$REMOTE_HOST" "docker exec $CONTAINER_ID test -f $DEST_TAR_FILE"; then
+if ssh "$REMOTE_HOST" "docker exec $CONTAINER_ID test -f $REMOTE_PATH/work_dirs/211108_1622_gta2cs_daformer_s0_7f24c"; then
     echo "Tar file already exists inside the container. Skipping..."
 else
     rsync -avz "$TAR_FILE" "$REMOTE_HOST:$DEST_TAR_FILE"
@@ -74,49 +74,51 @@ if ssh "$REMOTE_HOST" "docker exec $CONTAINER_ID test -d '/DAFormer-SCDD/data/ci
     echo "Cityscapes data exists, skipping..."
 else
     ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c 'mkdir -p /DAFormer-SCDD/data/cityscapes'"
-    ssh "$REMOTE_HOST" "docker cp /home/shiva/Desktop/leftImg8bit_trainvaltest.zip $CONTAINER_ID:/DAFormer-SCDD/data/cityscapes/"
+    rsync -avz "/home/shiva/Desktop/leftImg8bit_trainvaltest.zip" "$REMOTE_HOST:/home/shanifi/code/DAFormer-SCDD/data/cityscapes"
+    rsync -avz "/home/shiva/Desktop/gtFine_trainvaltest.zip"  "$REMOTE_HOST:/home/shanifi/code/DAFormer-SCDD/data/cityscapes"
+    ssh "$REMOTE_HOST" "docker cp /home/shanifi/code/DAFormer-SCDD/data/cityscapes/leftImg8bit_trainvaltest.zip $CONTAINER_ID:/DAFormer-SCDD/data/cityscapes/"
 
-    ssh "$REMOTE_HOST" "docker cp /home/shiva/Desktop/gtFine_trainvaltest.zip "$CONTAINER_ID:/DAFormer-SCDD/data/cityscapes"
+    ssh "$REMOTE_HOST" "docker cp /home/shanifi/code/DAFormer-SCDD/data/cityscapes/gtFine_trainvaltest.zip $CONTAINER_ID:/DAFormer-SCDD/data/cityscapes"
     
     ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c '
     cd /DAFormer-SCDD/data/cityscapes && \
     unzip leftImg8bit_trainvaltest.zip && \
     unzip gtFine_trainvaltest.zip && \
-    rm leftImg8bit_trainvaltest.zip gtFine_trainvaltest.zip
-    '"
+    rm leftImg8bit_trainvaltest.zip gtFine_trainvaltest.zip '"
     echo "Cityscapes dataset copied, unzipped, and original files deleted"
 fi
 
 ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c 'python tools/convert_datasets/cityscapes.py data/cityscapes --nproc 8'"
 
-## GTA DATASET
-#if [[ ! -f /home/shiva/Desktop/10_images.zip && ! -f /home/shiva/Desktop/10_labels.zip ]]; then 
-#    echo "GTA dataset is not downloaded. Exiting..."
-#    exit 1
-#fi
-#
-#if ssh "$REMOTE_HOST" "docker exec $CONTAINER_ID test -d '/DAFormer-SCDD/data/gta/images'"; then
-#    echo "GTA data exists, skipping..."
-#else
-#    ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bas -c 'mkdir -p /DAFormer-SCDD/data/gta'"
-#    for f in /home/shiva/Desktop/*_images.zip; do
-#        scp "$f" "$REMOTE_HOST:/DAFormer-SCDD/data/gta"
-#    done
-#    echo "GTA image zip files copied"
-#    
-#    for f in /home/shiva/Desktop/*_labels.zip; do
-#        scp "$f" "$REMOTE_HOST:/DAFormer-SCDD/data/gta"
-#    done
-#    echo "GTA label zip files copied"
-#
-#    # unzip and remove the zip files
-#    ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c '
-#    cd /DAFormer-SCDD/data/gta && \
-#    unzip \"*.zip\" && \
-#    rm *.zip
-#    '"
-#    echo "GTA dataset copied, unzipped, and original files deleted"
-#fi
-#
-#ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c 'python tools/convert_datasets/gta.py data/gta --nproc 8'"
+# GTA DATASET
+
+if [[ ! -f /home/shiva/Desktop/10_images.zip && ! -f /home/shiva/Desktop/10_labels.zip ]]; then 
+    echo "GTA dataset is not downloaded. Exiting..."
+    exit 1
+fi
+
+if ssh "$REMOTE_HOST" "docker exec $CONTAINER_ID test -d '/DAFormer-SCDD/data/gta/images'"; then
+    echo "GTA data exists, skipping..."
+else
+    ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bas -c 'mkdir -p /DAFormer-SCDD/data/gta'"
+    for f in /home/shiva/Desktop/*_images.zip; do
+        scp "$f" "$REMOTE_HOST:/DAFormer-SCDD/data/gta"
+    done
+    echo "GTA image zip files copied"
+    
+    for f in /home/shiva/Desktop/*_labels.zip; do
+        scp "$f" "$REMOTE_HOST:/DAFormer-SCDD/data/gta"
+    done
+    echo "GTA label zip files copied"
+
+    # unzip and remove the zip files
+    ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c '
+    cd /DAFormer-SCDD/data/gta && \
+    unzip \"*.zip\" && \
+    rm *.zip
+    '"
+    echo "GTA dataset copied, unzipped, and original files deleted"
+fi
+
+ssh "$REMOTE_HOST" "docker exec -it $CONTAINER_ID bash -c 'python tools/convert_datasets/gta.py data/gta --nproc 8'"
 
